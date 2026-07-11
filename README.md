@@ -72,7 +72,7 @@ The JavaScript is organized into four logical categories:
 
 ## Running the Project
 
-github page: [Interactive Task Manager]
+github page: [Interactive Task Manager](https://kavyamc.github.io/InteractiveTaskManager/)
 
 ## Accessibility
 
