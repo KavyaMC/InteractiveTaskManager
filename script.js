@@ -62,9 +62,36 @@ function handleTaskClick(event) {
     }
 }
 
-function EnableTaskEdit(event) { }
-function finishTaskEdit(event) { }
-function handleEditKey(event) { }
+function EnableTaskEdit(event) {
+    const target = event.target;
+    if (!target.classList.contains('task-text')) {
+        return;
+    } else {
+        target.parentElement.contentEditable = true;
+        target.parentElement.focus();
+        target.execCommand('selectAll');
+    }
+}
+
+function finishTaskEdit(event) {
+    const target = event.target;
+    if (target.parentElement.contentEditable === 'true') {
+        event.preventDefault();
+        target.parentElement.contentEditable = false;
+        target.textContent = target.textContent.trim();
+        if (target.textContent === '') {
+            target.textContent = 'Untitled Task';
+        }
+    }
+}
+
+function handleEditKey(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        finishTaskEdit(event);
+    }
+}
+
 function handleSearch(event) { }
 function showAllTasks() { }
 function showActiveTasks() { }
@@ -81,4 +108,5 @@ function bootSystem() {
     setupSearchListener();
     setupFilterButtons();
 }
+
 document.addEventListener('DOMContentLoaded', bootSystem);
