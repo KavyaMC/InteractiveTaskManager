@@ -89,24 +89,63 @@ function handleEditKey(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
         finishTaskEdit(event);
+        event.target.blur();
     }
 }
 
-function handleSearch(event) { }
-function showAllTasks() { }
-function showActiveTasks() { }
-function showCompletedTasks() { }
-function setupFormListener() { }
-function setupTaskListListener() { }
-function setupEditListeners() { }
-function setupSearchListener() { }
-function setupFilterButtons() { }
-function bootSystem() {
-    setupFormListener();
-    setupTaskListListener();
-    setupEditListeners();
-    setupSearchListener();
-    setupFilterButtons();
-}
+function handleSearch(event) {
+    const searchTerm = event.target.value.trim().toLowerCase();
+    const taskList = document.getElementById('task-list');
+    const taskItems = taskList.querySelectorAll('li');
+    for (const taskItem of taskItems) {
+        const taskText = taskItem.querySelector('.task-text').textContent.toLowerCase();
+        if (taskText.includes(searchTerm)) {
+            taskItem.style.display = '';
+        } else {
+            taskItem.style.display = 'none';
+        }
+    }
 
-document.addEventListener('DOMContentLoaded', bootSystem);
+    function showAllTasks() {
+        const tasks = document.getElementById('task-list').children;
+        for (const task of tasks) {
+            task.style.display = '';
+        }
+    }
+
+    function showActiveTasks() {
+        const tasks = document.getElementById('task-list').children;
+        for (const task of tasks) {
+            if (task.querySelector('input[type="checkbox"]').checked) {
+                task.style.display = 'none';
+            } else {
+                task.style.display = '';
+            }
+        }
+    }
+
+    function showCompletedTasks() {
+        const tasks = document.getElementById('task-list').children;
+        for (const task of tasks) {
+            if (task.querySelector('input[type="checkbox"]').checked) {
+                task.style.display = '';
+            } else {
+                task.style.display = 'none';
+            }
+        }
+    }
+
+    function setupFormListener() { }
+    function setupTaskListListener() { }
+    function setupEditListeners() { }
+    function setupSearchListener() { }
+    function setupFilterButtons() { }
+    function bootSystem() {
+        setupFormListener();
+        setupTaskListListener();
+        setupEditListeners();
+        setupSearchListener();
+        setupFilterButtons();
+    }
+
+    document.addEventListener('DOMContentLoaded', bootSystem);
