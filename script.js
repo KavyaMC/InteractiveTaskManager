@@ -27,7 +27,7 @@ function createTaskItem(text) {
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete';
     deleteButton.classList.add("delete-btn", "btn", "btn-danger", "btn-sm");
-    taskListItem.append("checkBox", "taskText", "deleteButton");
+    taskListItem.append(checkBox, taskText, deleteButton);
     return taskListItem;
 }
 
@@ -105,47 +105,74 @@ function handleSearch(event) {
             taskItem.style.display = 'none';
         }
     }
+}
 
-    function showAllTasks() {
-        const tasks = document.getElementById('task-list').children;
-        for (const task of tasks) {
+function showAllTasks() {
+    const tasks = document.getElementById('task-list').children;
+    for (const task of tasks) {
+        task.style.display = '';
+    }
+}
+
+function showActiveTasks() {
+    const tasks = document.getElementById('task-list').children;
+    for (const task of tasks) {
+        if (task.querySelector('input[type="checkbox"]').checked) {
+            task.style.display = 'none';
+        } else {
             task.style.display = '';
         }
     }
+}
 
-    function showActiveTasks() {
-        const tasks = document.getElementById('task-list').children;
-        for (const task of tasks) {
-            if (task.querySelector('input[type="checkbox"]').checked) {
-                task.style.display = 'none';
-            } else {
-                task.style.display = '';
-            }
+function showCompletedTasks() {
+    const tasks = document.getElementById('task-list').children;
+    for (const task of tasks) {
+        if (task.querySelector('input[type="checkbox"]').checked) {
+            task.style.display = '';
+        } else {
+            task.style.display = 'none';
         }
     }
+}
 
-    function showCompletedTasks() {
-        const tasks = document.getElementById('task-list').children;
-        for (const task of tasks) {
-            if (task.querySelector('input[type="checkbox"]').checked) {
-                task.style.display = '';
-            } else {
-                task.style.display = 'none';
-            }
-        }
-    }
+function setupFormListener() {
+    const form = document.getElementById('task-form');
+    form.addEventListener('submit', handleAddTask);
+}
 
-    function setupFormListener() { }
-    function setupTaskListListener() { }
-    function setupEditListeners() { }
-    function setupSearchListener() { }
-    function setupFilterButtons() { }
-    function bootSystem() {
-        setupFormListener();
-        setupTaskListListener();
-        setupEditListeners();
-        setupSearchListener();
-        setupFilterButtons();
-    }
+function setupTaskListListener() {
+    const taskList = document.getElementById('task-list');
+    taskList.addEventListener('click', handleTaskClick);
+}
 
-    document.addEventListener('DOMContentLoaded', bootSystem);
+function setupEditListeners() {
+    const taskList = document.getElementById('task-list');
+    taskList.addEventListener('dblclick', EnableTaskEdit);
+    taskList.addEventListener('blur', finishTaskEdit, true);
+    taskList.addEventListener('keydown', handleEditKey);
+}
+
+function setupSearchListener() {
+    const searchInput = document.getElementById('search-input');
+    searchInput.addEventListener('input', handleSearch);
+}
+
+function setupFilterButtons() {
+    const showAllButton = document.getElementById('show-all-btn');
+    const showActiveButton = document.getElementById('show-active-btn');
+    const showCompletedButton = document.getElementById('show-completed-btn');
+    showAllButton.addEventListener('click', showAllTasks);
+    showActiveButton.addEventListener('click', showActiveTasks);
+    showCompletedButton.addEventListener('click', showCompletedTasks);
+}
+
+function bootSystem() {
+    setupFormListener();
+    setupTaskListListener();
+    setupEditListeners();
+    setupSearchListener();
+    setupFilterButtons();
+}
+
+document.addEventListener('DOMContentLoaded', bootSystem);
