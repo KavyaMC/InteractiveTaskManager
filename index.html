@@ -34,9 +34,9 @@
         <section class="card p-3 mb-3">
             <h2>Filter Tasks</h2>
             <div class="btn-group">
-                <button id="show-all" class="btn btn-secondary">All</button>
-                <button id="show-active" class="btn btn-secondary">Active</button>
-                <button id="show-completed" class="btn btn-secondary">Completed</button>
+                <button type="button" id="show-all" class="btn btn-secondary">All</button>
+                <button type="button" id="show-active" class="btn btn-secondary">Active</button>
+                <button type="button" id="show-completed" class="btn btn-secondary">Completed</button>
             </div>
         </section>
 
@@ -44,13 +44,13 @@
             <h2>Statistics</h2>
             <ul class="list-group">
                 <li class="list-group-item">
-                    Total Tasks: <span id="total-count" aria-live="polite">0</span>
+                    Total Tasks: <span id="total-count">0</span>
                 </li>
                 <li class="list-group-item">
-                    Completed: <span id="completed-count" aria-live="polite">0</span>
+                    Completed: <span id="completed-count">0</span>
                 </li>
                 <li class="list-group-item">
-                    Remaining: <span id="remaining-count" aria-live="polite">0</span>
+                    Remaining: <span id="remaining-count">0</span>
                 </li>
             </ul>
         </section>
@@ -61,6 +61,8 @@
                 <!-- Tasks appear here -->
             </ul>
         </section>
+        <div id="live-region" class="visually-hidden" aria-live="polite" aria-atomic="true">
+        </div>
     </main>
     <script src="script.js"></script>
 </body>

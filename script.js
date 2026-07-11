@@ -1,18 +1,17 @@
 function updateStatistics() {
     const taskList = document.getElementById('task-list');
     const totalTasks = taskList.children.length;
-    let activeTasks = 0;
     let completedTasks = 0;
     for (const task of taskList.children) {
-        if (taskList.children.querySelector('input[type="checkbox"]').checked) {
+        if (task.querySelector('input').checked) {
             completedTasks++;
-        } else {
-            activeTasks++;
         }
     }
-    document.getElementById('total-tasks').textContent = totalTasks;
-    document.getElementById('active-tasks').textContent = activeTasks;
-    document.getElementById('completed-tasks').textContent = totalTasks - activeTasks;
+
+    document.getElementById('total-count').textContent = totalTasks;
+    document.getElementById('completed-count').textContent = completedTasks;
+    document.getElementById('remaining-count').textContent = totalTasks - completedTasks;
+    announce(`Task summary updated. ${totalTasks} total tasks, ${completedTasks} completed, ${totalTasks - completedTasks} remaining.`);
 }
 
 function createTaskItem(text) {
@@ -23,7 +22,8 @@ function createTaskItem(text) {
     checkBox.classList.add("text-checkbox", "form-check-input", "me-2");
     const taskText = document.createElement('span');
     taskText.textContent = text;
-    taskText.classList.add("task-text");
+    taskText.classList.add('task-text', 'flex-grow-1', 'ms-2');
+    taskText.tabIndex = 0;
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete';
     deleteButton.classList.add("delete-btn", "btn", "btn-danger", "btn-sm");
@@ -41,99 +41,116 @@ function handleAddTask(event) {
         taskList.appendChild(newTaskItem);
         taskInput.value = '';
         taskInput.focus();
+        announce(`Task "${taskText}" added.`);
         updateStatistics();
     }
 }
 
-function handleTaskClick(event) {
+function handleAddClick(event) {
     const target = event.target;
+
     if (target.classList.contains('delete-btn')) {
         target.parentElement.remove();
+        announce("Task Deleted");
         updateStatistics();
+        return;
     }
-    const tasks = document.getElementById('task-list').children;
-    for (const task of tasks) {
-        if (target === task.querySelector('input[type="checkbox"]').checked) {
-            target.classList.add("completed-task", "text-decoration-line-through");
+    if (target.type === 'checkbox') {
+        const taskText = target.parentElement.querySelector('.task-text');
+
+        if (target.checked) {
+            taskText.classList.add('text-decoration-line-through');
+            announce("Task Completed");
         } else {
-            target.classList.add("active-task", "text-decoration-none");
+            taskText.classList.remove('text-decoration-line-through');
+            announce("Task Marked as Incomplete");
         }
+
         updateStatistics();
+
     }
 }
 
-function EnableTaskEdit(event) {
-    const target = event.target;
-    if (!target.classList.contains('task-text')) {
+function enableTaskEdit(event) {
+    if (!event.target.classList.contains("task-text")) {
         return;
-    } else {
-        target.parentElement.contentEditable = true;
-        target.parentElement.focus();
-        target.execCommand('selectAll');
     }
+
+    event.target.contentEditable = true;
+    event.target.focus();
 }
 
 function finishTaskEdit(event) {
-    const target = event.target;
-    if (target.parentElement.contentEditable === 'true') {
-        event.preventDefault();
-        target.parentElement.contentEditable = false;
-        target.textContent = target.textContent.trim();
-        if (target.textContent === '') {
-            target.textContent = 'Untitled Task';
-        }
+    if (!event.target.classList.contains("task-text")) {
+        return;
+    }
+
+    event.target.contentEditable = false;
+
+    if (event.target.textContent.trim() === "") {
+        event.target.textContent = "Untitled Task";
     }
 }
 
 function handleEditKey(event) {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
         event.preventDefault();
-        finishTaskEdit(event);
         event.target.blur();
     }
 }
 
 function handleSearch(event) {
-    const searchTerm = event.target.value.trim().toLowerCase();
-    const taskList = document.getElementById('task-list');
-    const taskItems = taskList.querySelectorAll('li');
-    for (const taskItem of taskItems) {
-        const taskText = taskItem.querySelector('.task-text').textContent.toLowerCase();
-        if (taskText.includes(searchTerm)) {
-            taskItem.style.display = '';
+    const search = event.target.value.toLowerCase();
+    const tasks = document.getElementById("task-list").children;
+
+    let visible = 0;
+
+    for (const task of tasks) {
+        const text = task.querySelector(".task-text").textContent.toLowerCase();
+
+        if (text.includes(search)) {
+            task.style.display = "";
+            visible++;
         } else {
-            taskItem.style.display = 'none';
+            task.style.display = "none";
         }
     }
+
+    announce(`${visible} matching task${visible === 1 ? "" : "s"} found.`);
 }
 
 function showAllTasks() {
-    const tasks = document.getElementById('task-list').children;
+    const tasks = document.getElementById("task-list").children;
+
     for (const task of tasks) {
-        task.style.display = '';
+        task.style.display = "";
     }
+
+    announce("Showing all tasks.");
 }
 
 function showActiveTasks() {
-    const tasks = document.getElementById('task-list').children;
+    const tasks = document.getElementById("task-list").children;
+
     for (const task of tasks) {
-        if (task.querySelector('input[type="checkbox"]').checked) {
-            task.style.display = 'none';
-        } else {
-            task.style.display = '';
-        }
+        const checkbox = task.querySelector('input[type="checkbox"]');
+
+        task.style.display = checkbox.checked ? "none" : "";
     }
+
+    announce("Showing active tasks.");
 }
 
 function showCompletedTasks() {
-    const tasks = document.getElementById('task-list').children;
+    const tasks = document.getElementById("task-list").children;
+
     for (const task of tasks) {
-        if (task.querySelector('input[type="checkbox"]').checked) {
-            task.style.display = '';
-        } else {
-            task.style.display = 'none';
-        }
+        const checkbox = task.querySelector('input[type="checkbox"]');
+
+        task.style.display = checkbox.checked ? "" : "none";
     }
+
+    announce("Showing completed tasks.");
 }
 
 function setupFormListener() {
@@ -143,12 +160,12 @@ function setupFormListener() {
 
 function setupTaskListListener() {
     const taskList = document.getElementById('task-list');
-    taskList.addEventListener('click', handleTaskClick);
+    taskList.addEventListener('click', handleAddClick);
 }
 
 function setupEditListeners() {
     const taskList = document.getElementById('task-list');
-    taskList.addEventListener('dblclick', EnableTaskEdit);
+    taskList.addEventListener('dblclick', enableTaskEdit);
     taskList.addEventListener('blur', finishTaskEdit, true);
     taskList.addEventListener('keydown', handleEditKey);
 }
@@ -159,9 +176,9 @@ function setupSearchListener() {
 }
 
 function setupFilterButtons() {
-    const showAllButton = document.getElementById('show-all-btn');
-    const showActiveButton = document.getElementById('show-active-btn');
-    const showCompletedButton = document.getElementById('show-completed-btn');
+    const showAllButton = document.getElementById('show-all');
+    const showActiveButton = document.getElementById('show-active');
+    const showCompletedButton = document.getElementById('show-completed');
     showAllButton.addEventListener('click', showAllTasks);
     showActiveButton.addEventListener('click', showActiveTasks);
     showCompletedButton.addEventListener('click', showCompletedTasks);
@@ -173,6 +190,11 @@ function bootSystem() {
     setupEditListeners();
     setupSearchListener();
     setupFilterButtons();
+    updateStatistics();
+}
+
+function announce(message) {
+    document.getElementById("live-region").textContent = message;
 }
 
 document.addEventListener('DOMContentLoaded', bootSystem);
